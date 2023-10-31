@@ -1,0 +1,19 @@
+# /node_modules/* in the project root is ignored by default
+# build artefacts
+dist/*
+coverage/*
+jest.config.js
+test/*
+index.d.ts
+temp/*
+web
+ormconfig.js
+dev.ormconfig.js
+stage.ormconfig.js
+prod.ormconfig.js
+src/database/migrations/*
+script/*
+config/*
+worker/*
+docs/*
+tests/*

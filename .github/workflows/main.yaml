@@ -1,0 +1,45 @@
+name: Main CI
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  test:
+    name: Test
+    uses: ./.github/workflows/test.yaml
+
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+    needs: test
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs:
+      - build
+    steps:
+      - name: "Download build"
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+      - name: "export REPO_NAME to env"
+        run: echo REPO_NAME=`basename $GITHUB_REPOSITORY` >> $GITHUB_ENV
+      - name: "export COMMIT_NAME to env as a basename of GITHUB_SHA"
+        run: echo COMMIT_NAME=`basename $GITHUB_SHA` >> $GITHUB_ENV
+      - run: echo $COMMIT_NAME
+      - name: Deploy to ElasticBeanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.AWS_BEANSTALK_APPLICATION_NAME }}
+          environment_name: ${{ secrets.AWS_BEANSTALK_APPLICATION_ENV }}
+          version_label: ${{ env.REPO_NAME }}-${{ env.COMMIT_NAME }}
+          use_existing_version_if_available: true
+          region: ${{ secrets.AWS_REGION }}
+          deployment_package: build.zip
+          wait_for_deployment: false
+

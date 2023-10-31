@@ -1,0 +1,42 @@
+name: Build and store artifact
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: ""
+
+      - name: Add cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: "Build code"
+        run: npm run build
+
+      - name: "Zip build"
+        uses: vimtor/action-zip@v1
+        with:
+          files: dist/ scripts/ aws/ Procfile package.json package-lock.json tsconfig.json tsconfig.build.json
+          recursive: false
+          dest: build.zip
+      - name: "Store artifact"
+        uses: actions/upload-artifact@v1
+        with:
+          name: build
+          path: ${{ github.workspace }}/build.zip

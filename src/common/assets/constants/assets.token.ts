@@ -1,0 +1,1 @@
+export const S3_ASSETS_SERVICE = "S3_ASSETS_SERVICE";

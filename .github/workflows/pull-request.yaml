@@ -1,0 +1,13 @@
+name: Pull request
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  test:
+    concurrency:
+      group: ${{ github.head_ref || github.run_id }}
+      cancel-in-progress: true
+    name: Run tests
+    uses: ./.github/workflows/test.yaml
