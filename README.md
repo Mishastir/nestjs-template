@@ -27,13 +27,13 @@ Create `docker-compose.local.yaml` from `docker-compose.dev.yaml`:
 Generate Prisma Client
 
 ```bash
-$ prisma generate
+$ npx prisma generate
 ```
 
 Run all Prisma migrations
 
 ```bash
-$ prisma migrate dev
+$ npx prisma migrate dev
 ```
 
 ## Running the app
