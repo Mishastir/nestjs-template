@@ -1,13 +1,13 @@
-import { Body, Controller, Delete, Get, Patch, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Patch } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
+import { User } from "@prisma/client";
 
 import { UpdateProfileBody } from "../dto";
-import { UserEntity } from "../entities";
+import { UserModel } from "../models";
 import { UsersService } from "../services";
 
 import { SuccessResponse } from "@module/common/abstract";
 import { ReqUser, WithAuth } from "@module/common/decorators";
-import { UserAvatarSignInterceptor } from "@module/common/interceptors";
 
 @ApiTags("User")
 @Controller("users")
@@ -16,33 +16,21 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get("my")
-  @ApiResponse({ status: 200, type: UserEntity })
-  async getMyUser(@ReqUser() user: UserEntity): Promise<UserEntity> {
+  @ApiResponse({ status: 200, type: UserModel })
+  async getMyUser(@ReqUser() user: UserModel): Promise<UserModel> {
     return user;
   }
 
   @Delete("my")
   @ApiResponse({ status: 201, type: SuccessResponse })
-  async deleteUser(@ReqUser() user: UserEntity): Promise<SuccessResponse> {
-    const response = await this.userService.delete({ id: user.id });
-    return { success: response };
+  async deleteUser(@ReqUser() user: UserModel): Promise<SuccessResponse> {
+    await this.userService.delete({ where: { id: user.id } });
+    return { success: true };
   }
 
   @Patch("my")
-  @ApiResponse({ status: 201, type: UserEntity })
-  @UseInterceptors(UserAvatarSignInterceptor)
-  async updateUser(@ReqUser() user: UserEntity, @Body() body: UpdateProfileBody): Promise<UserEntity> {
+  @ApiResponse({ status: 201, type: UserModel })
+  async updateUser(@ReqUser() user: UserModel, @Body() body: UpdateProfileBody): Promise<User> {
     return await this.userService.updateProfile({ ...body, id: user.id });
   }
-
-  // @Post("my/avatar")
-  // @ApiConsumes("multipart/form-data")
-  // @ApiFile("avatar")
-  // @UseInterceptors(FileInterceptor("avatar", { limits: { fileSize: 5e6 }}))
-  // async uploadFile(
-  //   @UploadImagesFile() file: Express.Multer.File,
-  //   @ReqUserId() userId: number,
-  // ): Promise<UploadAvatarResponseDto> {
-  //   return await this.userService.saveAvatar(userId, file);
-  // }
 }

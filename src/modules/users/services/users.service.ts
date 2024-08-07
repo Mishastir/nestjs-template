@@ -1,47 +1,41 @@
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { FindOneOptions, FindOptionsWhere, Repository, UpdateResult } from "typeorm";
+import { Prisma, User } from "@prisma/client";
 
-import { UpdateProfileDto } from "../dto";
-import { UserEntity } from "../entities";
+import { CreateUserDto, UpdateProfileDto } from "../dto";
+import { UserModel } from "../models";
+
+import { PrismaService } from "@database";
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
+    private readonly prismaService: PrismaService,
   ) { }
 
-  async create(data: Partial<UserEntity>): Promise<UserEntity> {
-    const newUserRecord = this.userRepository.create(data);
-    const newUser = await this.userRepository.save(newUserRecord);
-
-    return newUser;
+  async create(data: CreateUserDto): Promise<User> {
+    return await this.prismaService.user.create({ data });
   }
 
-  async updateById(id: string, data: Partial<UserEntity>): Promise<UpdateResult> {
-    return await this.userRepository.update({ id }, data);
+  async updateById(id: string, data: Partial<UserModel>): Promise<User> {
+    return await this.prismaService.user.update({ where: { id }, data });
   }
 
-  async updateProfile(data: UpdateProfileDto): Promise<UserEntity> {
+  async updateProfile(data: UpdateProfileDto): Promise<User> {
     const { id, ...restData } = data;
 
-    await this.userRepository.update({ id }, restData);
-
-    return await this.userRepository.findOneBy({ id });
+    return await this.prismaService.user.update({ where: { id }, data: restData });
   }
 
-  async findById(id: string): Promise<UserEntity> {
-    return await this.userRepository.findOneBy({ id });
+  async findById(id: string): Promise<User> {
+    return await this.prismaService.user.findUniqueOrThrow({ where: { id } });
   }
 
-  async findOne(data: FindOneOptions<UserEntity>): Promise<UserEntity> {
-    return await this.userRepository.findOne(data);
+  async findOne(data: Prisma.UserFindFirstArgs): Promise<User> {
+    return await this.prismaService.user.findFirst(data);
   }
 
-  async delete(data: FindOptionsWhere<UserEntity>): Promise<boolean> {
-    const { affected } = await this.userRepository.delete(data);
-    return affected !== 0;
+  async delete(data: Prisma.UserDeleteArgs): Promise<void> {
+    await this.prismaService.user.delete(data);
   }
 
   // async saveAvatar(userId: string, file: Express.Multer.File): Promise<UploadAvatarResponseDto> {

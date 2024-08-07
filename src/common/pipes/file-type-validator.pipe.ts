@@ -15,6 +15,9 @@ export class FileTypeValidator extends FileValidator<ValidationOptions> {
   }
 
   isValid(file: Express.Multer.File): boolean | Promise<boolean> {
+    if (this.allowedMimeTypes.includes("*/*")) {
+      return true;
+    }
 
     return this.allowedMimeTypes.includes(file.mimetype);
   }

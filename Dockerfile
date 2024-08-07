@@ -1,4 +1,4 @@
-FROM node:20.5 as build
+FROM node:22.4-alpine as build
 
 RUN mkdir -p /opt/node_app && chown -R node:node /opt/node_app
 WORKDIR /opt/node_app
@@ -10,10 +10,13 @@ RUN npm ci
 
 COPY --chown=node:node tsconfig.json tsconfig.build.json ./
 COPY --chown=node:node src ./src
+COPY --chown=node:node prisma ./prisma
+
+RUN npx prisma generate
 
 RUN npm run build
 
-FROM node:20.5-alpine
+FROM node:22.4-alpine
 
 RUN mkdir -p /opt/node_app && chown -R node:node /opt/node_app
 WORKDIR /opt/node_app
@@ -36,4 +39,4 @@ ENV NODE_ENV=production
 ENV NODE_OPTIONS="--enable-source-maps"
 
 EXPOSE $PORT
-CMD [ "node", "start:prod"]
+CMD [ "npm", "run", "start:prod"]

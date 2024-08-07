@@ -7,7 +7,7 @@ export const UploadImagesFile = (): ParameterDecorator => (
     new ParseFilePipe({
       validators: [
         new FileTypeValidator({
-          fileTypes: ["image/jpeg", "image/pjpeg", "image/png", "image/svg+xml", "image/gif"],
+          fileTypes: ["image/jpeg", "image/pjpeg", "image/png", "image/svg+xml", "image/gif", "image/webp"],
         }),
       ],
     }),

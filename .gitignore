@@ -106,3 +106,5 @@ dist
 docker-compose.local.yaml
 
 .idea
+.run
+.vscode

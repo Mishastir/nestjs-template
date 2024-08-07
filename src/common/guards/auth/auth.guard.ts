@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 
+import { ServiceException } from "@module/common/exceptions";
 import { SessionService } from "@module/common/session";
 
 @Injectable()
@@ -24,13 +25,9 @@ export class AuthGuard implements CanActivate {
       request.user = user;
       return true;
     } catch (e) {
-      const toThrow = new UnauthorizedException({
-        statusCode: 401,
-        category: "UNAUTHORIZED",
-        message: "Token is not valid",
-      });
       this.logger.error(e);
-      throw toThrow;
+
+      throw new ServiceException("Token is not valid", "ACCESS_TOKEN_IS_INVALID", "UNAUTHORIZED");
     }
   }
 }

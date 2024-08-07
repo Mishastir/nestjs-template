@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 
-import { UserEntity } from "../../users/entities";
-import { UserRole } from "../../users/enums";
-import { UsersService } from "../../users/services";
 import { LoginUserDto, RegisterUserDto } from "../dto";
 
 import { CryptoHashService } from "@module/common/crypto";
 import { ServiceException } from "@module/common/exceptions";
 import { SessionService, SessionWithUserDto } from "@module/common/session";
+import { UserRole } from "@module/modules/users/enums";
+import { UserModel } from "@module/modules/users/models";
+import { UsersService } from "@module/modules/users/services";
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
 
     return ({
       ...session,
-      user: newUser as UserEntity,
+      user: newUser as UserModel,
     });
   }
 
@@ -43,7 +43,7 @@ export class AuthService {
       throw new ServiceException("Password or email is incorrect", "INCORRECT_PASSWORD_OR_EMAIL", "VALIDATION");
     }
 
-    const user = await this.usersService.findById(userWithPassword.id);
+    const user = await this.usersService.findById(userWithPassword.id) as UserModel;
     const session = await this.sessionService.createUserSession({ userId: user.id });
 
     return ({

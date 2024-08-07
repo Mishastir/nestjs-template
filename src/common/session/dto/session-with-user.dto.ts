@@ -2,9 +2,9 @@ import { ApiProperty } from "@nestjs/swagger";
 
 import { UserSessionDto } from "./user-session.dto";
 
-import { UserEntity } from "@module/modules/users/entities";
+import { UserModel } from "@module/modules/users/models";
 
 export class SessionWithUserDto extends UserSessionDto {
-  @ApiProperty({ type: () => UserEntity })
-  user: UserEntity;
+  @ApiProperty({ type: () => UserModel })
+  user: UserModel;
 }

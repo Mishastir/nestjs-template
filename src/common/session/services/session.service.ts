@@ -1,14 +1,13 @@
-import { Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Injectable, NotAcceptableException } from "@nestjs/common";
 
 import { CreateUserSessionDto, UserSessionDto } from "../dto";
 import { AccessTokenPayload, RefreshTokenPayload } from "../types";
 
 import { JwtService } from "./jwt.service";
 
-import { ConfigService } from "@module/config";
-import { UserEntity } from "@module/modules/users/entities";
+import { ConfigService } from "@config";
+import { PrismaService } from "@database";
+import { UserModel } from "@module/modules/users/models";
 
 @Injectable()
 export class SessionService {
@@ -17,8 +16,7 @@ export class SessionService {
 
   constructor(
     private readonly configService: ConfigService,
-    @InjectRepository(UserEntity)
-    private readonly userModel: Repository<UserEntity>,
+    private readonly prismaService: PrismaService,
   ) {
     this.jwtAccessTokenService = new JwtService({
       privateKey: this.configService.jwt.privateKey,
@@ -26,6 +24,7 @@ export class SessionService {
       ttlInSeconds: this.configService.jwt.accessTtl,
     });
 
+    // TODO: Access and refresh should have different keys
     this.jwtRefreshTokenService = new JwtService({
       privateKey: this.configService.jwt.privateKey,
       publicKey: this.configService.jwt.publicKey,
@@ -33,15 +32,12 @@ export class SessionService {
     });
   }
 
-  async getUserFromToken(token: string): Promise<UserEntity> {
+  async getUserFromToken(token: string): Promise<UserModel> {
     const { userId } = await this.getTokenPayload(token);
 
-    const user = await this.userModel.findOneBy({ id: userId });
-    if (!user) {
-      throw new NotFoundException("User not found");
-    }
-
-    return user;
+    return await this.prismaService.user.findUniqueOrThrow({
+      where: { id: userId },
+    }) as UserModel;
   }
 
   async createUserSession(data: CreateUserSessionDto): Promise<UserSessionDto> {

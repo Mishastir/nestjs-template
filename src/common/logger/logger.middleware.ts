@@ -49,9 +49,11 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   private successLog(obj: Record<string, string | number>): void {
     this.logger.log(obj);
   }
+
   private warnLog(obj: Record<string, string | number>): void {
     this.logger.warn(obj);
   }
+
   private errorLog(obj: Record<string, string | number>): void {
     this.logger.error(obj);
   }

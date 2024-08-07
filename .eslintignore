@@ -7,13 +7,10 @@ test/*
 index.d.ts
 temp/*
 web
-ormconfig.js
-dev.ormconfig.js
-stage.ormconfig.js
-prod.ormconfig.js
 src/database/migrations/*
 script/*
 config/*
 worker/*
 docs/*
 tests/*
+prisma/seeds

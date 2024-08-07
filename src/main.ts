@@ -5,7 +5,8 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 import { AppModule } from "./app.module";
 import { LoggerService } from "./common/logger";
-import { ConfigService } from "./config";
+
+import { ConfigService } from "@config";
 
 async function bootstrap(): Promise<void> {
   const config = new ConfigService();

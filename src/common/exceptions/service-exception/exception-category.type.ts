@@ -5,4 +5,5 @@ export type IServiceExceptionCategory =
   | "VALIDATION"
   | "EXTERNAL_API"
   | "SYSTEM_INTERNAL"
-  | "NOT_ALLOWED";
+  | "NOT_ALLOWED"
+  | "UNAUTHORIZED";

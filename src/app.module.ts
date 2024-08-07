@@ -1,43 +1,49 @@
 import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
-import { DevtoolsModule } from "@nestjs/devtools-integration";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { ThrottlerModule } from "@nestjs/throttler";
 
-import { AssetsModule } from "./common/assets";
-import { ContextModule, HttpContextMiddleware } from "./common/context";
+import { ConfigModule } from "@config";
+import { DatabaseModule } from "@database";
+import { AssetsModule } from "@module/common/assets";
+import { ContextModule, HttpContextMiddleware } from "@module/common/context";
 import {
   GlobalAnyExceptionFilter,
   GlobalBadRequestExceptionFilter,
+  GlobalForbiddenExceptionFilter,
   GlobalHttpExceptionFilter,
+  GlobalPrismaExceptionFilter,
   GlobalServiceExceptionFilter,
-} from "./common/filters";
-import { HttpLoggerMiddleware, LoggerModule } from "./common/logger";
-import { SessionModule } from "./common/session";
-import { ConfigModule } from "./config";
-import { rootDbConfig } from "./database";
-import { AuthModule } from "./modules/auth";
-import { UsersModule } from "./modules/users";
+} from "@module/common/filters";
+import { HttpLoggerMiddleware, LoggerModule } from "@module/common/logger";
+import { SessionModule } from "@module/common/session";
+import { AuthModule } from "@module/modules/auth";
+import { UsersModule } from "@module/modules/users";
 
 @Module({
   imports: [
     AuthModule,
+    DatabaseModule,
     SessionModule,
     UsersModule,
     AssetsModule,
     ConfigModule,
     LoggerModule,
     ContextModule,
-    TypeOrmModule.forRootAsync(rootDbConfig),
-    DevtoolsModule.register({
-      http: process.env.NODE_ENV !== "production",
-    }),
+    ThrottlerModule.forRoot([
+      // Default rate limit. Works only when route using @RateLimit()
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
   ],
-  controllers: [],
   providers: [
     { provide: APP_FILTER, useClass: GlobalAnyExceptionFilter },
     { provide: APP_FILTER, useClass: GlobalBadRequestExceptionFilter },
     { provide: APP_FILTER, useClass: GlobalHttpExceptionFilter },
+    { provide: APP_FILTER, useClass: GlobalPrismaExceptionFilter },
     { provide: APP_FILTER, useClass: GlobalServiceExceptionFilter },
+    { provide: APP_FILTER, useClass: GlobalForbiddenExceptionFilter },
   ],
 })
 export class AppModule {

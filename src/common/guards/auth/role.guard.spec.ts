@@ -59,7 +59,7 @@ describe("RoleGuard", () => {
     const result = roleGuard.canActivate(contextWithoutUser);
 
     await expect(result).rejects.toThrow(Error);
-    await expect(result).rejects.toStrictEqual(new Error("No `user` in request. Are you sure you put RoleGuard after AuthGuard?"));
+    await expect(result).rejects.toStrictEqual(new Error(`No 'user' in request. Are you sure you put ${RoleGuard.name} after AuthGuard?`));
   });
 
   it("should throw error when user role is wrong", async () => {

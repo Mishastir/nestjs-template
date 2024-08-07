@@ -28,7 +28,9 @@
     "esModuleInterop": true,
     "tsBuildInfoFile": "./dist/tsbuildinfo.json",
     "paths": {
-      "@module/*": ["*"]
+      "@module/*": ["*"],
+      "@database": ["./database"],
+      "@config": ["./config"],
     }
   }
 }

@@ -22,6 +22,20 @@ Create `docker-compose.local.yaml` from `docker-compose.dev.yaml`:
 - If you want to start server using docker change nothing in docker-compose and just start it
 - If you want to start server with npm scripts leave only db startup in docker and run it
 
+### Prisma Installation
+
+Generate Prisma Client
+
+```bash
+$ prisma generate
+```
+
+Run all Prisma migrations
+
+```bash
+$ prisma migrate dev
+```
+
 ## Running the app
 
 ```bash

@@ -9,6 +9,7 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnauthorizedException,
   UnprocessableEntityException,
 } from "@nestjs/common";
 import { Response } from "express";
@@ -27,6 +28,7 @@ export class GlobalServiceExceptionFilter implements ExceptionFilter {
       ["VALIDATION", (message) => new BadRequestException(message)],
       ["EXTERNAL_API", (message) => new UnprocessableEntityException(message)],
       ["UNKNOWN", () => new InternalServerErrorException("Internal error")],
+      ["UNAUTHORIZED", (message) => new UnauthorizedException(message)],
     ]);
   }
 

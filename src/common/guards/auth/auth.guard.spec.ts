@@ -3,6 +3,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 
 import { AuthGuard } from "./auth.guard";
 
+import { ServiceException } from "@module/common/exceptions";
 import { SessionService } from "@module/common/session";
 
 const buildContext = (headers: Record<string, unknown>): ExecutionContext => {
@@ -67,11 +68,7 @@ describe("AuthGuard", () => {
   it("should throw error when token is invalid", async () => {
     const result = authGuard.canActivate(invalidTokenContext);
 
-    await expect(result).rejects.toThrow(UnauthorizedException);
-    await expect(result).rejects.toStrictEqual(new UnauthorizedException({
-      statusCode: 401,
-      category: "UNAUTHORIZED",
-      message: "Token is not valid",
-    }));
+    await expect(result).rejects.toThrow(ServiceException);
+    await expect(result).rejects.toStrictEqual(new ServiceException("Token is not valid", "UNAUTHORIZED", "UNAUTHORIZED"));
   });
 });
