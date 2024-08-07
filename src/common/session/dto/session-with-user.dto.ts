@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-import { UserSessionDto } from "./index";
+import { UserSessionDto } from "./user-session.dto";
 
 import { UserEntity } from "@module/modules/users/entities";
 
